@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyNews</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a2e;
+      background: #f8f9fa;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 24px 32px 16px;
+    }
+
+    header h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .updated {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px 32px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      color: #475569;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .filter-btn.active {
+      background: #1a1a2e;
+      color: #fff;
+      border-color: #1a1a2e;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      border-left: 4px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .source-badge {
+      font-weight: 600;
+    }
+
+    time {
+      color: #94a3b8;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .card h2 a {
+      color: #1a1a2e;
+      text-decoration: none;
+    }
+
+    .card h2 a:hover {
+      color: #4f46e5;
+      text-decoration: underline;
+    }
+
+    .summary {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 16px;
+      padding: 48px 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      header {
+        background: #1e293b;
+        border-bottom-color: #334155;
+      }
+
+      .updated {
+        color: #94a3b8;
+      }
+
+      .filters {
+        background: #1e293b;
+        border-bottom-color: #334155;
+      }
+
+      .filter-btn {
+        background: #1e293b;
+        border-color: #334155;
+        color: #cbd5e1;
+      }
+
+      .filter-btn:hover {
+        background: #334155;
+      }
+
+      .filter-btn.active {
+        background: #e2e8f0;
+        color: #0f172a;
+        border-color: #e2e8f0;
+      }
+
+      .card {
+        background: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+
+      .card h2 a {
+        color: #e2e8f0;
+      }
+
+      .card h2 a:hover {
+        color: #818cf8;
+      }
+
+      .summary {
+        color: #94a3b8;
+      }
+
+      time {
+        color: #64748b;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 16px;
+      }
+
+      .filters {
+        padding: 12px 16px;
+      }
+
+      main {
+        padding: 0 12px;
+        margin: 16px auto;
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MyNews</h1>
+    <p class="updated">Last updated: 2026-02-24 22:35</p>
+  </header>
+  <nav class="filters">
+    <button class="filter-btn active" data-source="all">All</button>
+        <button class="filter-btn" data-source="import-ai">🤖 Import AI</button>
+        <button class="filter-btn" data-source="simon-willison">💻 Simon Willison</button>
+        <button class="filter-btn" data-source="lennys-newsletter">📊 Lenny's Newsletter</button>
+        <button class="filter-btn" data-source="nng">🔬 NN/g</button>
+        <button class="filter-btn" data-source="maggie-appleton">🌿 Maggie Appleton</button>
+
+  </nav>
+  <main>
+      <article class="card" data-source="lennys-newsletter" style="border-left-color: #d97706">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #d97706">📊 Lenny&#x27;s Newsletter</span>
+          <time datetime="2026-02-24">2026-02-24</time>
+        </div>
+        <h2><a href="https://www.lennysnewsletter.com/p/how-to-use-ai-for-your-next-job-interview" target="_blank" rel="noopener noreferrer">How to use AI for your next job interview</a></h2>
+        <p class="summary">Insights from 30+ tech professionals, and a free AI coach to put them into practice</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-24">2026-02-24</time>
+        </div>
+        <h2><a href="https://simonwillison.net/guides/agentic-engineering-patterns/first-run-the-tests/#atom-everything" target="_blank" rel="noopener noreferrer">First run the tests</a></h2>
+        <p class="summary">Agentic Engineering Patterns &gt; Automated tests are no longer optional when working with coding agents. The old excuses for not writing them - that they&#x27;re time consuming and expensive to constantly...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/23/ladybird-adopts-rust/#atom-everything" target="_blank" rel="noopener noreferrer">Ladybird adopts Rust, with help from AI</a></h2>
+        <p class="summary">Ladybird adopts Rust, with help from AI Really interesting case-study from Andreas Kling on advanced, sophisticated use of coding agents for ambitious coding projects with critical code. After a few...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/23/agentic-engineering-patterns/#atom-everything" target="_blank" rel="noopener noreferrer">Writing about Agentic Engineering Patterns</a></h2>
+        <p class="summary">I&#x27;ve started a new project to collect and document Agentic Engineering Patterns - coding practices and patterns to help get the best results out of this new era of coding agent development we find...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/guides/agentic-engineering-patterns/code-is-cheap/#atom-everything" target="_blank" rel="noopener noreferrer">Writing code is cheap now</a></h2>
+        <p class="summary">Agentic Engineering Patterns &gt; The biggest challenge in adopting agentic engineering practices is getting comfortable with the consequences of the fact that writing code is cheap now. Code has always...</p>
+      </article>
+      <article class="card" data-source="lennys-newsletter" style="border-left-color: #d97706">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #d97706">📊 Lenny&#x27;s Newsletter</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://www.lennysnewsletter.com/p/this-week-on-how-i-ai-how-notions" target="_blank" rel="noopener noreferrer">🎙️ This week on How I AI: How Notion’s design team uses Claude Code to design</a></h2>
+        <p class="summary">Your weekly listens from How I AI, part of the Lenny&#x27;s Podcast Network</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/23/paul-ford/#atom-everything" target="_blank" rel="noopener noreferrer">Quoting Paul Ford</a></h2>
+        <p class="summary">The paper asked me to explain vibe coding, and I did so, because I think something big is coming there, and I&#x27;m deep in, and I worry that normal people are not able to see it and I want them to be...</p>
+      </article>
+      <article class="card" data-source="import-ai" style="border-left-color: #6366f1">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #6366f1">🤖 Import AI</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://importai.substack.com/p/import-ai-446-nuclear-llms-chinas" target="_blank" rel="noopener noreferrer">Import AI 446: Nuclear LLMs; China&#x27;s big AI benchmark; measurement and AI policy</a></h2>
+        <p class="summary">Will AIs be jealous of one another?</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/23/reply-guy/#atom-everything" target="_blank" rel="noopener noreferrer">Reply guy</a></h2>
+        <p class="summary">The latest scourge of Twitter is AI bots that reply to your tweets with generic, banal commentary slop, often accompanied by a question to &quot;drive engagement&quot; and waste as much of your time as...</p>
+      </article>
+      <article class="card" data-source="lennys-newsletter" style="border-left-color: #d97706">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #d97706">📊 Lenny&#x27;s Newsletter</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://www.lennysnewsletter.com/p/i-havent-written-a-single-line-of" target="_blank" rel="noopener noreferrer">“I haven’t written a single line of front-end code in 3 months”: How Notion’s design team uses Claude Code to prototype</a></h2>
+        <p class="summary">Watch now | 🎙️ Notion&#x27;s Brian Lovin on building a shared prototype playground, using Claude Code to transform Figma designs into working code, and why AI is changing how designers work</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/23/summer-yue/#atom-everything" target="_blank" rel="noopener noreferrer">Quoting Summer Yue</a></h2>
+        <p class="summary">Nothing humbles you like telling your OpenClaw “confirm before acting” and watching it speedrun deleting your inbox. I couldn’t stop it from my phone. I had to RUN to my Mac mini like I was defusing...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-23">2026-02-23</time>
+        </div>
+        <h2><a href="https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/#atom-everything" target="_blank" rel="noopener noreferrer">Red/green TDD</a></h2>
+        <p class="summary">Agentic Engineering Patterns &gt; &quot;Use red/green TDD&quot; is a pleasingly succinct way to get better results out of a coding agent. TDD stands for Test Driven Development. It&#x27;s a programming style where you...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-22">2026-02-22</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/22/ccc/#atom-everything" target="_blank" rel="noopener noreferrer">The Claude C Compiler: What It Reveals About the Future of Software</a></h2>
+        <p class="summary">The Claude C Compiler: What It Reveals About the Future of Software On February 5th Anthropic&#x27;s Nicholas Carlini wrote about a project to use parallel Claudes to build a C compiler on top of the...</p>
+      </article>
+      <article class="card" data-source="simon-willison" style="border-left-color: #059669">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #059669">💻 Simon Willison</span>
+          <time datetime="2026-02-22">2026-02-22</time>
+        </div>
+        <h2><a href="https://simonwillison.net/2026/Feb/22/raspberry-pi-openclaw/#atom-everything" target="_blank" rel="noopener noreferrer">London Stock Exchange: Raspberry Pi Holdings plc</a></h2>
+        <p class="summary">London Stock Exchange: Raspberry Pi Holdings plc Striking graph illustrating stock in the UK Raspberry Pi holding company spiking on Tuesday: The Telegraph credited excitement around OpenClaw:...</p>
+      </article>
+      <article class="card" data-source="lennys-newsletter" style="border-left-color: #d97706">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #d97706">📊 Lenny&#x27;s Newsletter</span>
+          <time datetime="2026-02-21">2026-02-21</time>
+        </div>
+        <h2><a href="https://www.lennysnewsletter.com/p/community-wisdom-making-your-product" target="_blank" rel="noopener noreferrer">🧠 Community Wisdom: Making your product enterprise-ready, when engineering outpaces product, managing PRD versions as features evolve, planning work around energy, and more</a></h2>
+        <p class="summary">Community Wisdom 174</p>
+      </article>
+      <article class="card" data-source="nng" style="border-left-color: #dc2626">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #dc2626">🔬 NN/g</span>
+          <time datetime="2026-02-20">2026-02-20</time>
+        </div>
+        <h2><a href="https://www.nngroup.com/articles/smart-home-notifications/?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=rss-syndication" target="_blank" rel="noopener noreferrer">Designing Useful Smart Home Notifications</a></h2>
+        <p class="summary">Smart-home notifications should be timely, relevant, specific, and personalized to avoid overwhelming users and causing distrust or disengagement.</p>
+      </article>
+      <article class="card" data-source="nng" style="border-left-color: #dc2626">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #dc2626">🔬 NN/g</span>
+          <time datetime="2026-02-20">2026-02-20</time>
+        </div>
+        <h2><a href="https://www.nngroup.com/articles/recommendation-adoption-score/?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=rss-syndication" target="_blank" rel="noopener noreferrer">Tracking Adoption of Research Recommendations: The Recommendation-Adoption Score</a></h2>
+        <p class="summary">Use the RAS (Recommendation-Adoption Score) to track how much research value reaches your user.</p>
+      </article>
+      <article class="card" data-source="lennys-newsletter" style="border-left-color: #d97706">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #d97706">📊 Lenny&#x27;s Newsletter</span>
+          <time datetime="2026-02-19">2026-02-19</time>
+        </div>
+        <h2><a href="https://www.lennysnewsletter.com/p/head-of-claude-code-what-happens" target="_blank" rel="noopener noreferrer">Head of Claude Code: What happens after coding is solved | Boris Cherny</a></h2>
+        <p class="summary">Listen now | Anthropic’s Boris Cherny on building Claude Code, how to maximize AI productivity, and what comes next after coding is “solved”</p>
+      </article>
+      <article class="card" data-source="nng" style="border-left-color: #dc2626">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #dc2626">🔬 NN/g</span>
+          <time datetime="2026-02-18">2026-02-18</time>
+        </div>
+        <h2><a href="https://www.nngroup.com/training/may/?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=rss-syndication" target="_blank" rel="noopener noreferrer">UX Conference May Announced (May 11 - May 22)</a></h2>
+        <p class="summary">Take up to 5 in-depth training courses, teaching user experience best practices for successful design. Training focused on long-lasting skills for UX professionals. May 11 - May 22, 2026.</p>
+      </article>
+      <article class="card" data-source="import-ai" style="border-left-color: #6366f1">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #6366f1">🤖 Import AI</span>
+          <time datetime="2026-02-16">2026-02-16</time>
+        </div>
+        <h2><a href="https://importai.substack.com/p/import-ai-445-timing-superintelligence" target="_blank" rel="noopener noreferrer">Import AI 445: Timing superintelligence; AIs solve frontier math proofs; a new ML research benchmark</a></h2>
+        <p class="summary">Will 2026 be looked back on as the pivotal year for making decisions about the singularity?</p>
+      </article>
+      <article class="card" data-source="nng" style="border-left-color: #dc2626">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #dc2626">🔬 NN/g</span>
+          <time datetime="2026-02-13">2026-02-13</time>
+        </div>
+        <h2><a href="https://www.nngroup.com/articles/research-minors-consent/?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=rss-syndication" target="_blank" rel="noopener noreferrer">UX Research with Minors: Consent vs. Assent</a></h2>
+        <p class="summary">When conducting UX research with minors, you must obtain consent from a parent or legal guardian and assent from the minor participant.</p>
+      </article>
+      <article class="card" data-source="nng" style="border-left-color: #dc2626">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #dc2626">🔬 NN/g</span>
+          <time datetime="2026-02-13">2026-02-13</time>
+        </div>
+        <h2><a href="https://www.nngroup.com/articles/ux-consulting-ai/?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=rss-syndication" target="_blank" rel="noopener noreferrer">What UX Consulting Clients Expect in the Age of AI</a></h2>
+        <p class="summary">Clients still seek strong judgment and critical thinking, research rigor, and respect for real-world and user constraints from UX consultants.</p>
+      </article>
+      <article class="card" data-source="import-ai" style="border-left-color: #6366f1">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #6366f1">🤖 Import AI</span>
+          <time datetime="2026-02-09">2026-02-09</time>
+        </div>
+        <h2><a href="https://importai.substack.com/p/import-ai-444-llm-societies-huawei" target="_blank" rel="noopener noreferrer">Import AI 444: LLM societies; Huawei makes kernels with AI; ChipBench</a></h2>
+        <p class="summary">How can you quantify creativity?</p>
+      </article>
+      <article class="card" data-source="import-ai" style="border-left-color: #6366f1">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #6366f1">🤖 Import AI</span>
+          <time datetime="2026-02-02">2026-02-02</time>
+        </div>
+        <h2><a href="https://importai.substack.com/p/import-ai-443-into-the-mist-moltbook" target="_blank" rel="noopener noreferrer">Import AI 443: Into the mist: Moltbook, agent ecologies, and the internet in transition</a></h2>
+        <p class="summary">Plus, a story about agents corrupting other agents</p>
+      </article>
+      <article class="card" data-source="import-ai" style="border-left-color: #6366f1">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #6366f1">🤖 Import AI</span>
+          <time datetime="2026-01-26">2026-01-26</time>
+        </div>
+        <h2><a href="https://importai.substack.com/p/import-ai-442-winners-and-losers" target="_blank" rel="noopener noreferrer">Import AI 442: Winners and losers in the AI economy; math proof automation; and industrialization of cyber espionage</a></h2>
+        <p class="summary">Is superintelligence a phase change or a gradual shift?</p>
+      </article>
+      <article class="card" data-source="maggie-appleton" style="border-left-color: #16a34a">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #16a34a">🌿 Maggie Appleton</span>
+          <time datetime="2026-01-23">2026-01-23</time>
+        </div>
+        <h2><a href="https://maggieappleton.com/gastown/" target="_blank" rel="noopener noreferrer">Gas Town’s Agent Patterns, Design Bottlenecks, and Vibecoding at Scale</a></h2>
+        <p class="summary">On agent orchestration patterns, why design and critical thinking are the new bottlenecks, and whether we should let go of looking at code</p>
+      </article>
+      <article class="card" data-source="maggie-appleton" style="border-left-color: #16a34a">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #16a34a">🌿 Maggie Appleton</span>
+          <time datetime="2026-01-02">2026-01-02</time>
+        </div>
+        <h2><a href="https://maggieappleton.com/now-2026-01/" target="_blank" rel="noopener noreferrer">January 2026</a></h2>
+        <p class="summary">I entered the new year holding an inconsolable, shrieking baby while London set off an armageddon of fireworks around us. So goes parenthood. The baby is fine, just congested and teething. I am as...</p>
+      </article>
+      <article class="card" data-source="maggie-appleton" style="border-left-color: #16a34a">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #16a34a">🌿 Maggie Appleton</span>
+          <time datetime="2025-08-05">2025-08-05</time>
+        </div>
+        <h2><a href="https://maggieappleton.com/ai-enlightenment/" target="_blank" rel="noopener noreferrer">A Treatise on AI Chatbots Undermining the Enlightenment</a></h2>
+        <p class="summary">On chatbot sycophancy, passivity, and the case for more intellectually challenging companions</p>
+      </article>
+      <article class="card" data-source="maggie-appleton" style="border-left-color: #16a34a">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #16a34a">🌿 Maggie Appleton</span>
+          <time datetime="2025-08-02">2025-08-02</time>
+        </div>
+        <h2><a href="https://maggieappleton.com/2025-08-vibe-legacy-code/" target="_blank" rel="noopener noreferrer">Vibe Code is Legacy Code</a></h2>
+        <p class="summary">Vibe code is legacy code by Steve Krouse</p>
+      </article>
+      <article class="card" data-source="maggie-appleton" style="border-left-color: #16a34a">
+        <div class="card-meta">
+          <span class="source-badge" style="color: #16a34a">🌿 Maggie Appleton</span>
+          <time datetime="2025-05-25">2025-05-25</time>
+        </div>
+        <h2><a href="https://maggieappleton.com/now-2025-05/" target="_blank" rel="noopener noreferrer">May 2025</a></h2>
+        <p class="summary">In a wonderfully dramatic change to my life, I became a mother two months ago. My son was born at the end of March via an unplanned but otherwise uncomplicated c-section. Parenthood has been...</p>
+      </article>
+
+  </main>
+  <script>
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var source = this.dataset.source;
+        document.querySelectorAll('.card').forEach(function(card) {
+          card.style.display = (source === 'all' || card.dataset.source === source) ? '' : 'none';
+        });
+        document.querySelectorAll('.filter-btn').forEach(function(b) {
+          b.classList.toggle('active', b === btn);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
